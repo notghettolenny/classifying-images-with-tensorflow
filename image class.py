@@ -2,7 +2,7 @@ import tensorflow as tf
 
 print('Using TensorFlow version', tf.__version__)
 tf.logging.set_verbosity(tf.logging.ERROR)
-
+#import mnist dataset
 from tensorflow.keras.datasets import mnist
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
@@ -18,17 +18,17 @@ plt.imshow(x_train[0], cmap = 'binary')
 plt.show()
 y_train[0]
 y_train[:10]
-
+#encoding
 from tensorflow.python.keras.utils import to_categorical
 
 y_train_encoded = to_categorical(y_train)
 y_test_encoded = to_categorical(y_test)
-
+#evaluate shape of encoded labels
 print('y_train shape: ', y_train_encoded.shape)
 print('y_test shape: ', y_test_encoded.shape)
-
+#evaluate first label
 y_train_encoded[0]
-
+#preprocessing images
 import numpy as np
 
 x_train_reshaped = np.reshape(x_train, (60000, 784))
@@ -41,16 +41,16 @@ print(set(x_train_reshaped[0]))
 
 x_mean = np.mean(x_train_reshaped)
 x_std = np.std(x_train_reshaped)
-
+#calculate mean and standard deviation
 print('mean: ', x_mean)
 print('std: ', x_std)
-
+#normalize training and test set with mean and standard deviation
 epsilon = 1e-10
 x_train_norm = (x_train_reshaped - x_mean)/(x_std + epsilon)
 x_test_norm = (x_test_reshaped - x_mean)/(x_std + epsilon)
 
 print(set(x_train_norm[0]))
-
+#create sequential class in keras
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
@@ -60,7 +60,7 @@ model = Sequential([
     Dense(10, activation = 'softmax')
 ])
 
-
+#model tracking
 model.compile(
     optimizer = 'sgd',
     loss = 'categorical_crossentropy',
@@ -68,17 +68,17 @@ model.compile(
 )
 
 model.summary()
-
+#model training
 h = model.fit(
     x_train_norm,
     y_train_encoded,
     epochs = 3
 )
-
+#evaluate the performance on the test set
 loss, accuracy = model.evaluate(x_test_norm, y_test_encoded)
 
 print('test set accuracy: ', accuracy * 100)
-
+#predictions
 preds = model.predict(x_test_norm)
 
 print('shape of preds: ', preds.shape)
